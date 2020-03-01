@@ -1,0 +1,17 @@
+urgent:
+
+dss support for omap3
+mcspi fixup for omap3
+uart revision for omap3
+
+
+consider: 
+
+rename omap2_l4ta_init -> omap2_l4ta_get
+rename omap3_l4ta_init -> omap3_l4ta_get
+
+
+refactor omap3_mmc from a "qdev" to whatever happened to the omap2 mmc and uarts
+
+
+

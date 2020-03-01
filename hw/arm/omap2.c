@@ -949,7 +949,7 @@ static const struct omap_l4_region_s omap_l4_region[125] = {
     [124] = { 0xb3000, 0x1000, 32 | 16 | 8 }, /* L4TA39 */
 };
 
-static const struct omap_l4_agent_info_s omap_l4_agent_info[54] = {
+static const struct omap2_l4_agent_info_s omap2_l4_agent_info[54] = {
     { 0,           0, 3, 2 }, /* L4IA initiatior agent */
     { L4TAO(1),    3, 2, 1 }, /* Control and pinout module */
     { L4TAO(2),    5, 2, 1 }, /* 32K timer */
@@ -1007,9 +1007,9 @@ static const struct omap_l4_agent_info_s omap_l4_agent_info[54] = {
 };
 
 #define omap_l4ta(bus, cs)	\
-    omap_l4ta_get(bus, omap_l4_region, omap_l4_agent_info, L4TA(cs))
+    omap2_l4ta_init(bus, omap_l4_region, omap2_l4_agent_info, L4TA(cs))
 #define omap_l4tao(bus, cs)	\
-    omap_l4ta_get(bus, omap_l4_region, omap_l4_agent_info, L4TAO(cs))
+    omap2_l4ta_init(bus, omap_l4_region, omap2_l4_agent_info, L4TAO(cs))
 
 /* Power, Reset, and Clock Management */
 struct omap_prcm_s {
