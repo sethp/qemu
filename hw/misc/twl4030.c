@@ -22,12 +22,15 @@
  * MA 02111-1307 USA
  */
 
+#include "qemu/osdep.h"
 #include "hw/hw.h"
 #include "qemu/timer.h"
 #include "hw/i2c/i2c.h"
+#include "hw/irq.h"
 #include "sysemu/sysemu.h"
+#include "sysemu/runstate.h"
+#include "sysemu/reset.h"
 #include "ui/console.h"
-#include "exec/cpu-all.h"
 
 //#define DEBUG_GENERAL
 //#define DEBUG_RTC
@@ -67,7 +70,7 @@ struct TWL4030NodeState {
     twl4030_write_func write_func;
     TWL4030State *twl4030;
 
-    uint8 reg_data[256];
+    uint8_t reg_data[256];
 };
 
 struct TWL4030State {
@@ -1036,7 +1039,7 @@ static void twl4030_setup_alarm(TWL4030NodeState *s)
                 TRACE_RTC("new alarm interrupt in %" PRId64 " seconds", delta);
                 timer_mod(s->twl4030->alarm_timer,
                           qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)
-                          + get_ticks_per_sec() * delta);
+                          + NANOSECONDS_PER_SECOND * delta);
             }
         }
     } else {
@@ -1057,7 +1060,7 @@ static void twl4030_setup_periodic(TWL4030NodeState *s)
         TRACE_RTC("new periodic interrupt in %u seconds", t);
         timer_mod(s->twl4030->periodic_timer,
                   qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)
-                  + get_ticks_per_sec() * t);
+                  + NANOSECONDS_PER_SECOND * t);
     } else {
         timer_del(s->twl4030->periodic_timer);
     }
@@ -1289,7 +1292,7 @@ static void twl4030_4b_write(TWL4030NodeState *s, uint8_t addr, uint8_t value)
             s->reg_data[addr] = value & 0x78;
             if (value & 0x01) { /* DEVOFF */
                 TRACE("device power off sequence requested");
-                qemu_system_shutdown_request();
+                qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
             }
             break;
         case 0x4a: /* PB_CFG */
