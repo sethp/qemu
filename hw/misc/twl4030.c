@@ -1592,49 +1592,46 @@ static void twl4030_node_init(TWL4030NodeState *s,
     twl4030_node_reset(s, reset_values);
 }
 
-static int twl4030_48_init(I2CSlave *i2c)
+static void twl4030_48_realize(DeviceState *dev, Error **errp)
 {
-    twl4030_node_init(TWL4030NODE(i2c),
+    twl4030_node_init(TWL4030NODE(dev),
                       twl4030_48_read, twl4030_48_write,
                       addr_48_reset_values);
-    return 0;
 }
 
-static int twl4030_49_init(I2CSlave *i2c)
+static void twl4030_49_realize(DeviceState *dev, Error **errp)
 {
-    twl4030_node_init(TWL4030NODE(i2c),
+    twl4030_node_init(TWL4030NODE(dev),
                       twl4030_49_read, twl4030_49_write,
                       addr_49_reset_values);
-    return 0;
 }
 
-static int twl4030_4a_init(I2CSlave *i2c)
+static void twl4030_4a_realize(DeviceState *dev, Error **errp)
 {
-    TWL4030NodeState *s = TWL4030NODE(i2c);
+    TWL4030NodeState *s = TWL4030NODE(dev);
     twl4030_node_init(s,
                       twl4030_4a_read, twl4030_4a_write,
                       addr_4a_reset_values);
     qemu_add_kbd_event_handler(twl4030_key_handler, s);
-    return 0;
 }
 
-static int twl4030_4b_init(I2CSlave *i2c)
+static void twl4030_4b_realize(DeviceState *dev, Error **errp)
 {
-    twl4030_node_init(TWL4030NODE(i2c),
+    twl4030_node_init(TWL4030NODE(dev),
                       twl4030_4b_read, twl4030_4b_write,
                       addr_4b_reset_values);
-    return 0;
 }
 
-static void twl4030_event(I2CSlave *i2c, enum i2c_event event)
+static int twl4030_event(I2CSlave *i2c, enum i2c_event event)
 {
     if (event == I2C_START_SEND) {
         TWL4030NodeState *s = TWL4030NODE(i2c);
         s->firstbyte = 1;
     }
+    return 0;
 }
 
-static int twl4030_rx(I2CSlave *i2c)
+static uint8_t twl4030_rx(I2CSlave *i2c)
 {
     TWL4030NodeState *s = TWL4030NODE(i2c);
     return s->read_func(s, s->reg++);
@@ -1675,26 +1672,26 @@ static void twl4030_reset(void *opaque)
 
 static void twl4030_48_class_init(ObjectClass *klass, void *data)
 {
-    I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
-    k->init = twl4030_48_init;
+    DeviceClass *dc = DEVICE_CLASS(klass);
+    dc->realize = twl4030_48_realize;
 }
 
 static void twl4030_49_class_init(ObjectClass *klass, void *data)
 {
-    I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
-    k->init = twl4030_49_init;
+    DeviceClass *dc = DEVICE_CLASS(klass);
+    dc->realize = twl4030_49_realize;
 }
 
 static void twl4030_4a_class_init(ObjectClass *klass, void *data)
 {
-    I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
-    k->init = twl4030_4a_init;
+    DeviceClass *dc = DEVICE_CLASS(klass);
+    dc->realize = twl4030_4a_realize;
 }
 
 static void twl4030_4b_class_init(ObjectClass *klass, void *data)
 {
-    I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
-    k->init = twl4030_4b_init;
+    DeviceClass *dc = DEVICE_CLASS(klass);
+    dc->realize = twl4030_4b_realize;
 }
 
 static void twl4030_class_init(ObjectClass *klass, void *data)
