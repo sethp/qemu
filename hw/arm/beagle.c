@@ -23,6 +23,7 @@
 #include "qemu-common.h"
 #include "sysemu/sysemu.h"
 #include "hw/hw.h"
+#include "hw/irq.h"
 #include "hw/arm/omap.h"
 #include "hw/boards.h"
 #include "hw/i2c/i2c.h"
@@ -53,9 +54,8 @@ struct beagle_s {
 };
 
 static void beagle_common_init(MachineState *machine,
-                               ram_addr_t ram_size, int cpu_model)
+                               int cpu_model)
 {
-    MemoryRegion *sysmem = get_system_memory();
     struct beagle_s *s = (struct beagle_s *) g_malloc0(sizeof(*s));
     DriveInfo *dmtd = drive_get(IF_MTD, 0, 0);
     DriveInfo *dsd  = drive_get(IF_SD, 0, 0);
@@ -63,8 +63,8 @@ static void beagle_common_init(MachineState *machine,
     if (!dmtd && !dsd) {
         hw_error("%s: SD or NAND image required", __FUNCTION__);
     }
-    s->cpu = omap3_mpu_init(sysmem, cpu_model, ram_size,
-                            NULL, NULL, serial_hds[0], NULL);
+    memory_region_add_subregion(get_system_memory(), OMAP2_Q2_BASE, machine->ram);
+    s->cpu = omap3_mpu_init(machine->ram, cpu_model);
 
     s->nand = nand_init(dmtd ? blk_by_legacy_dinfo(dmtd) : NULL,
                         NAND_MFR_MICRON, 0xba);
@@ -91,22 +91,24 @@ static void beagle_common_init(MachineState *machine,
      */
     s->ddc = i2c_create_slave(omap_i2c_bus(s->cpu->i2c[2]), "i2c-ddc", 0x50);
 
-    omap_lcd_panel_attach(s->cpu->dss);
+    //omap_lcd_panel_attach(s->cpu->dss);
 }
 
 static void beagle_xm_init(MachineState *machine)
 {
-    beagle_common_init(machine, BEAGLE_XM_SDRAM_SIZE, omap3630);
+    beagle_common_init(machine, omap3630);
 }
 
 static void beagle_init(MachineState *machine)
 {
-    beagle_common_init(machine, BEAGLE_SDRAM_SIZE, omap3430);
+    beagle_common_init(machine, omap3430);
 }
 
 static void beagle_machine_init(MachineClass *mc) {
     mc->desc = "Beagle board (OMAP3530)";
     mc->init = beagle_init;
+    mc->default_ram_size = BEAGLE_SDRAM_SIZE;
+    mc->default_ram_id = "omap3_dram";
 }
 
 DEFINE_MACHINE("beagle", beagle_machine_init)
@@ -114,6 +116,8 @@ DEFINE_MACHINE("beagle", beagle_machine_init)
 static void beagle_xm_machine_init(MachineClass *mc) {
     mc->desc = "Beagle board XM (OMAP3630)";
     mc->init = beagle_xm_init;
+    mc->default_ram_size = BEAGLE_XM_SDRAM_SIZE;
+    mc->default_ram_id = "omap3_dram";
 }
 
 DEFINE_MACHINE("beaglexm", beagle_xm_machine_init)

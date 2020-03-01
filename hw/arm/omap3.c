@@ -4180,10 +4180,6 @@ struct omap_mpu_state_s *omap3_mpu_init(MemoryRegion *sdram,
     omap_clk_init(s);
 
     /* Memory-mapped stuff */
-    // TODO[Seth] ???
-    // memory_region_init_ram(&s->sdram, NULL, "omap3_dram", s->sdram_size,
-    //                        &error_abort);
-    // memory_region_add_subregion(sysmem, OMAP3_Q2_BASE, &s->sdram);
     memory_region_init_ram(&s->sram, NULL, "omap3_sram", s->sram_size,
                            &error_abort);
     memory_region_add_subregion(sysmem, OMAP3_SRAM_BASE, &s->sram);
