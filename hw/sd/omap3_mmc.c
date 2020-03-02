@@ -19,9 +19,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
+#include "qemu/osdep.h"
+#include "qemu/log.h"
+#include "hw/qdev-core.h"
 #include "hw/hw.h"
 #include "hw/arm/omap.h"
-#include "hw/sd.h"
+#include "hw/irq.h"
+#include "hw/sd/sd.h"
 #include "hw/sysbus.h"
 
 /* debug levels:
@@ -170,7 +174,7 @@ static void omap3_mmc_reset(DeviceState *dev)
     s->stop       = 0;
 
     if (s->card) {
-        sd_reset(s->card);
+	device_legacy_reset(DEVICE(s->card));
     }
 }
 
@@ -181,6 +185,11 @@ typedef enum
     sd_48_bits = 2,  /* response length 48 bits */
     sd_48b_bits = 3, /* response length 48 bits with busy after response */
 } omap3_sd_rsp_type_t;
+
+// TODO[Seth]
+static bool sd_is_mmc(void *ignored) {
+   return false;
+}
 
 static void omap3_mmc_command(OMAP3MMCState *host);
 
@@ -738,40 +747,64 @@ static void omap3_mmc_write(void *opaque, hwaddr addr,
     }
 }
 
+static uint64_t omap3_mmc_readfn(void *opaque, hwaddr addr,
+                                  unsigned size)
+{
+    switch (size) {
+    case 1:
+        return omap_badwidth_read32(opaque, addr);
+    case 2:
+        return omap_badwidth_read32(opaque, addr); /* TODO */
+    case 4:
+        return omap3_mmc_read(opaque, addr);
+    default:
+        g_assert_not_reached();
+    }
+}
+
+static void omap3_mmc_writefn(void *opaque, hwaddr addr,
+                              uint64_t value, unsigned size)
+{
+    switch (size) {
+    case 1:
+        omap_badwidth_write32(opaque, addr, value);
+        break;
+    case 2:
+        omap_badwidth_write32(opaque, addr, value); /* TODO */
+        break;
+    case 4:
+        omap3_mmc_write(opaque, addr, value);
+        break;
+    default:
+        g_assert_not_reached();
+    }
+}
+
 static const MemoryRegionOps omap3_mmc_ops = {
-    .old_mmio = {
-        .read = {
-            omap_badwidth_read32,
-            omap_badwidth_read32,
-            omap3_mmc_read,
-        },
-        .write = {
-            omap_badwidth_write32,
-            omap_badwidth_write32,
-            omap3_mmc_write,
-        },
-    },
+    .read = omap3_mmc_readfn,
+    .write = omap3_mmc_writefn,
+    .valid.min_access_size = 1,
+    .valid.max_access_size = 4,
     .endianness = DEVICE_NATIVE_ENDIAN,
 };
 
-static int omap3_mmc_init(SysBusDevice *dev)
+static void omap3_mmc_realize(DeviceState *dev, Error **errp)
 {
+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
     OMAP3MMCState *s = OMAP3_MMC(dev);
 
-    sysbus_init_irq(dev, &s->irq);
-    sysbus_init_irq(dev, &s->dma[0]);
-    sysbus_init_irq(dev, &s->dma[1]);
+    sysbus_init_irq(sbd, &s->irq);
+    sysbus_init_irq(sbd, &s->dma[0]);
+    sysbus_init_irq(sbd, &s->dma[1]);
     memory_region_init_io(&s->iomem, OBJECT(s), &omap3_mmc_ops, s,
                           "omap3_mmc", 0x1000);
-    sysbus_init_mmio(dev, &s->iomem);
-    return 0;
+    sysbus_init_mmio(sbd, &s->iomem);
 }
 
 static void omap3_mmc_class_init(ObjectClass *klass, void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-    k->init = omap3_mmc_init;
+    dc->realize = omap3_mmc_realize;
     dc->reset = omap3_mmc_reset;
 }
 
@@ -788,14 +821,14 @@ static void omap3_mmc_register_types(void)
 }
 
 void omap3_mmc_attach(DeviceState *dev, BlockBackend *blk,
-                      int is_spi, int is_mmc)
+                      bool is_spi)
 {
     OMAP3MMCState *s = OMAP3_MMC(dev);
 
     if (s->card) {
         hw_error("%s: card already attached!", __FUNCTION__);
     }
-    s->card = sd_init(blk, is_spi, is_mmc);
+    s->card = sd_init(blk, is_spi);
 }
 
 type_init(omap3_mmc_register_types)

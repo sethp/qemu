@@ -1030,7 +1030,7 @@ void omap_mmc_enable(struct omap_mmc_s *s, int enable);
 
 /* omap3_mmc.c */
 void omap3_mmc_attach(DeviceState *dev, BlockBackend *blk,
-                      int is_spi, int is_mmc);
+                      bool is_spi);
 
 /* omap_i2c.c */
 I2CBus *omap_i2c_bus(DeviceState *omap_i2c);

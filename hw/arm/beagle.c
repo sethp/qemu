@@ -73,7 +73,7 @@ static void beagle_common_init(MachineState *machine,
 
     if (dsd) {
         omap3_mmc_attach(s->cpu->omap3_mmc[0], blk_by_legacy_dinfo(dsd),
-                         0, 0);
+                         0);
     }
 
     s->twl4030 = twl4030_init(omap_i2c_bus(s->cpu->i2c[0]),

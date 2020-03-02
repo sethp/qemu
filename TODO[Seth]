@@ -10,8 +10,8 @@ consider:
 rename omap2_l4ta_init -> omap2_l4ta_get
 rename omap3_l4ta_init -> omap3_l4ta_get
 
-
 refactor omap3_mmc from a "qdev" to whatever happened to the omap2 mmc and uarts
 
+what counts as an MMC sd card, and when might that be turned on? So far it's always false
 
 
