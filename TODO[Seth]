@@ -14,4 +14,4 @@ refactor omap3_mmc from a "qdev" to whatever happened to the omap2 mmc and uarts
 
 what counts as an MMC sd card, and when might that be turned on? So far it's always false
 
-
+does omap_dma need to be target-specific (usage of ldl_p)?
