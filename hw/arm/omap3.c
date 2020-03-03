@@ -4170,7 +4170,7 @@ struct omap_mpu_state_s *omap3_mpu_init(MemoryRegion *sdram,
         hw_error("%s: invalid cpu model (%d)", __FUNCTION__, model);
     }
     s->mpu_model = model;
-    s->cpu = ARM_CPU(cpu_create("cortex-a8-r2"));
+    s->cpu = ARM_CPU(cpu_create(ARM_CPU_TYPE_NAME("cortex-a8-r2")));
     if (!s->cpu) {
         hw_error("%s: Unable to find CPU definition", __FUNCTION__);
     }
