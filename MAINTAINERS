@@ -215,6 +215,7 @@ S: Maintained
 F: target/mips/
 F: default-configs/*mips*
 F: disas/*mips*
+F: docs/system/cpu-models-mips.rst.inc
 F: hw/intc/mips_gic.c
 F: hw/mips/
 F: hw/misc/mips_*
@@ -319,7 +320,7 @@ F: tests/tcg/i386/
 F: tests/tcg/x86_64/
 F: hw/i386/
 F: disas/i386.c
-F: docs/qemu-cpu-models.texi
+F: docs/system/cpu-models-x86.rst.inc
 T: git https://github.com/ehabkost/qemu.git x86-next
 
 Xtensa TCG CPUs
@@ -365,9 +366,8 @@ S: Maintained
 F: target/arm/kvm.c
 
 MIPS KVM CPUs
-M: James Hogan <jhogan@kernel.org>
-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-S: Maintained
+M: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+S: Odd Fixes
 F: target/mips/kvm.c
 
 PPC KVM CPUs
@@ -614,6 +614,7 @@ S: Maintained
 F: hw/arm/integratorcp.c
 F: hw/misc/arm_integrator_debug.c
 F: include/hw/misc/arm_integrator_debug.h
+F: tests/acceptance/machine_arm_integratorcp.py
 
 MCIMX6UL EVK / i.MX6ul
 M: Peter Maydell <peter.maydell@linaro.org>
@@ -687,6 +688,7 @@ F: hw/rtc/twl92230.c
 F: include/hw/display/blizzard.h
 F: include/hw/input/tsc2xxx.h
 F: include/hw/misc/cbus.h
+F: tests/acceptance/machine_arm_n8x0.py
 
 Palm
 M: Andrzej Zaborowski <balrogg@gmail.com>
@@ -1006,6 +1008,7 @@ F: hw/mips/mips_malta.c
 F: hw/mips/gt64xxx_pci.c
 F: include/hw/southbridge/piix.h
 F: tests/acceptance/linux_ssh_mips_malta.py
+F: tests/acceptance/machine_mips_malta.py
 
 Mipssim
 M: Aleksandar Markovic <amarkovic@wavecomp.com>
@@ -1259,7 +1262,7 @@ S: Supported
 F: hw/s390x/ipl.*
 F: pc-bios/s390-ccw/
 F: pc-bios/s390-ccw.img
-F: docs/devel/s390-dasd-ipl.txt
+F: docs/devel/s390-dasd-ipl.rst
 T: git https://github.com/borntraeger/qemu.git s390-next
 L: qemu-s390x@nongnu.org
 
@@ -1570,7 +1573,7 @@ F: hw/s390x/ap-bridge.c
 F: include/hw/s390x/ap-device.h
 F: include/hw/s390x/ap-bridge.h
 F: hw/vfio/ap.c
-F: docs/vfio-ap.txt
+F: docs/system/vfio-ap.rst
 L: qemu-s390x@nongnu.org
 
 vhost
@@ -2231,7 +2234,7 @@ M: Stefan Hajnoczi <stefanha@redhat.com>
 S: Maintained
 F: trace/
 F: trace-events
-F: qemu-option-trace.texi
+F: docs/qemu-option-trace.rst.inc
 F: scripts/tracetool.py
 F: scripts/tracetool/
 F: scripts/qemu-trace-stap*
@@ -2801,7 +2804,7 @@ F: contrib/gitdm/*
 
 Incompatible changes
 R: libvir-list@redhat.com
-F: qemu-deprecated.texi
+F: docs/system/deprecated.rst
 
 Build System
 ------------
